@@ -1,11 +1,8 @@
 import { useState } from 'react'
 import {
   Card,
-  Input,
-  Checkbox,
   Button,
   Typography,
-  Chip,
 } from "@material-tailwind/react"
 
 const Books = ({show, books}) => {
@@ -13,9 +10,9 @@ const Books = ({show, books}) => {
 
   const genreDuplicateArray = books.map(b => b.genres).flat()
 
-  const genres = [...new Set(genreDuplicateArray)]
+  const genres = [...new Set(genreDuplicateArray)] //uses the Set object to remove duplicate values from the genreDuplicateArray
 
-  genres.push("all genres")
+  genres.push("All genres")
 
   console.log('genreArray', genres)
 

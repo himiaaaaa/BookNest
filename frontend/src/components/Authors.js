@@ -3,8 +3,6 @@ import { useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 import {
   Card,
-  Input,
-  Checkbox,
   Button,
   Typography,
 } from "@material-tailwind/react";

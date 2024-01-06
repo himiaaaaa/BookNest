@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -8,10 +8,10 @@ import Notify from './components/Notify'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
 import Loading from './components/Loading'
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Disclosure, } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { FaBook } from 'react-icons/fa'
+import { Routes, Route, Link } from 'react-router-dom'
 
 export const updateCache = (cache, query, addedBook) => {
   const uniqByTitle = (a) => {
@@ -37,6 +37,13 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [token, setToken] = useState(null)
   const client = useApolloClient()
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('library-user-token')
+    if (storedToken) {
+        setToken(storedToken);
+    }
+  }, [])
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -65,6 +72,7 @@ const App = () => {
     setToken(null)
     localStorage.clear()
     client.resetStore()
+    window.location.replace('/')
   }
 
   if(authors.loading || books.loading){
@@ -75,7 +83,7 @@ const App = () => {
 
   console.log('authors', authors.data.allAuthors)
   console.log('books', books.data.allBooks)
-  //console.log('user', user.data.me.favoriteGenre)
+  console.log('user', user.data.me)
 
   const notify = (message) => {
     setErrorMessage(message)
@@ -85,16 +93,18 @@ const App = () => {
   }
 
   const pageButtons = [
-    { name: 'authors', label: 'Authors', condition: undefined, action: () => setPage('authors') },
-    { name: 'books', label: 'Books', condition: undefined, action: () => setPage('books') },
+    { name: 'authors', path: '/', label: 'Authors', condition: undefined, action: () => setPage('authors') },
+    { name: 'books', path: '/books', label: 'Books', condition: undefined, action: () => setPage('books') },
     { 
-      name: 'login', 
+      name: 'login',
+      path: '/login', 
       label: 'Login', 
       condition: !token, 
       action: () => setPage('login') 
     },
     { 
       name: 'add', 
+      path: '/addBook',
       label: 'Add book', 
       condition: token,  
       action: () => setPage('add') 
@@ -103,9 +113,16 @@ const App = () => {
       name: 'logout', 
       label: 'Logout', 
       condition: token,  
-      action: logout
+      action: logout,
+      path: '/'
     },
-    { name: 'recommend', label: 'Recommend', condition: undefined, action: () => setPage('recommend') },
+    { 
+      name: 'recommend', 
+      label: 'Recommend', 
+      condition: undefined, 
+      action: () => setPage('recommend'),
+      path: '/recommend'
+     },
   ];
 
   return (
@@ -122,21 +139,25 @@ const App = () => {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4 text-white">
-                      {pageButtons.map((button) => (
-                          button.condition !== undefined && !button.condition ? null :
-                            <button
-                              key={button.name}
-                              href={button.href}
-                              onClick={button.action}
-                              className={classNames(
-                                page === button.name ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                'block rounded-md px-3 py-2 text-base font-medium'
-                              )}
-                              aria-current={page === button.name ? 'page' : undefined}
-                            >
-                              {button.label}
-                            </button>
+                      
+                      {pageButtons
+                        .filter((button) => button.condition === undefined || button.condition)
+                        .map((button) => (
+                          <Link
+                            key={button.name}
+                            to={button.path}
+                            href={button.href}
+                            onClick={button.action}
+                            className={classNames(
+                              page === button.name ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                              'block rounded-md px-3 py-2 text-base font-medium'
+                            )}
+                            aria-current={page === button.name ? 'page' : undefined}
+                          >
+                            {button.label}
+                          </Link>
                       ))}
+               
                       </div>
                     </div>
                   </div>
@@ -172,25 +193,41 @@ const App = () => {
                     >
                       {item.name}
                     </Disclosure.Button>
-                  ))}
+                    ))}
                 </div>
               </Disclosure.Panel>
             </>
             )}
+
       </Disclosure>
 
-      <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify} />
-
-      <Books show={page === 'books'} books={books.data.allBooks} />
-
-      <NewBook show={page === 'add'} setError={notify}/>
-
-      <LoginForm show={page === 'login'} setToken={setToken} setError={notify} /> 
-
-      <Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/>
+        <Routes>
+          <Route path='/' element={<Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/>} />
+          <Route path='/books' element={<Books show={page === 'books'} books={books.data.allBooks} setError={notify} />} />
+          <Route path='/addBook' element={token? <NewBook show={page === 'add'} setError={notify} /> : <LoginForm setToken={setToken} setError={notify}/>} />
+          <Route path='/recommend' element={<Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/>} />
+          <Route path='/login' element={token ? <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/> : <LoginForm show={page === 'login'} setToken={setToken} setError={notify}/>} />
+        </Routes>               
+      
     </div>
   )
 
+  //  {pageButtons.map((button) => (
+  //    button.condition !== undefined && !button.condition ? null :
+  //      <Link
+  //        key={button.name}
+  //        to={button.path}
+  //        href={button.href}
+  //        onClick={button.action}
+  //        className={classNames(
+  //          page === button.name ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+  //          'block rounded-md px-3 py-2 text-base font-medium'
+  //        )}
+  //        aria-current={page === button.name ? 'page' : undefined}
+  //      >
+  //        {button.label}
+  //      </Link>
+  //  ))}
 
   // return (
   //   <div className="bg-gray-100 min-h-screen">

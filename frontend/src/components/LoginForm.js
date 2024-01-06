@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
 import { LOGIN } from '../queries'
 import { FaBook } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 
 const LoginForm = ({ setError, setToken, show }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate()
 
     const [ login, result ] = useMutation(LOGIN, {
         onError: (error) => {
@@ -14,13 +16,17 @@ const LoginForm = ({ setError, setToken, show }) => {
         }
     })
 
+    console.log('login result', result)
+
     useEffect(() => {
         if(result.data){
             const token = result.data.login.value
             setToken(token)
             localStorage.setItem('library-user-token', token)
+            navigate('/')
+            window.location.reload()
         }
-    }, [result.data, setToken]) 
+    }, [ result.data, setToken, navigate ]) 
 
     if (!show) {
         return null
@@ -29,7 +35,7 @@ const LoginForm = ({ setError, setToken, show }) => {
     const submit = async (event) => {
         event.preventDefault()
 
-        login({ variables: { username, password } })
+        await login({ variables: { username, password } })
 
         setUsername('')
         setPassword('')
@@ -53,7 +59,7 @@ const LoginForm = ({ setError, setToken, show }) => {
                             <input
                                 value={username}
                                 onChange={({ target }) => setUsername(target.value)}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 pl-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                         </div>
                     </div>
@@ -67,7 +73,7 @@ const LoginForm = ({ setError, setToken, show }) => {
                             <input 
                                 value={password}
                                 onChange={({ target }) => setPassword(target.value)}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 pl-1.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                             />
                             </div>
                         </div>
