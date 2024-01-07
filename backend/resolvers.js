@@ -5,6 +5,9 @@ const { GraphQLError } = require('graphql')
 const jwt = require('jsonwebtoken')
 const { PubSub } = require('graphql-subscriptions')
 const pubsub = new PubSub()
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 
 const resolvers = {
     Query: {
@@ -28,6 +31,10 @@ const resolvers = {
       allAuthors: async () => {
         console.log('Author.find')
         return Author.find({}).populate('books')
+      },
+      allUsers: async () => {
+        console.log('User.find')
+        return User.find({})
       },
       me: async (root, args, context) => {
         return context.currentUser
@@ -128,26 +135,50 @@ const resolvers = {
         }
       },
       createUser: async (root, args) => {
+      
+      try{
+        const existingUser = await User.findOne({ username: args.username });
+
+        if (existingUser) {
+          throw new GraphQLError('Username is already taken', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+            },
+          });
+        }
+
+        const hashedPassword = await bcrypt.hash(args.password, saltRounds)
+
         const user = new User({ 
           username: args.username,
+          password: hashedPassword,
           favoriteGenre: args.favoriteGenre
          })
   
-        return user.save()
-          .catch(error => {
-            throw new GraphQLError('Creating the user failed', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                invalidArgs: args.name,
-                error
-              }
-            })
+        await user.save()
+
+        const userForToken = {
+          username: user.username,
+          id: user._id,
+        };
+    
+        const token = jwt.sign(userForToken, process.env.JWT_SECRET);
+
+        return { user, token: { value: token } }
+      }catch(error){
+          throw new GraphQLError('Creating the user failed', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              invalidArgs: args.name,
+              error
+            }
           })
+        }
       },
       login: async (root, args) => {
         const user = await User.findOne({ username: args.username })
   
-        if( !user || args.password != 'numberone' ){
+        if( !user || !(await bcrypt.compare(args.password, user.password)) ){
           throw new GraphQLError('wrong credentials', {
             extensions: {
               code: 'BAD_USER_INPUT'

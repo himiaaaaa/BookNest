@@ -34,6 +34,16 @@ query{
 ${BOOK_DETAILS}
 `
 
+export const ALL_USERS = gql`
+query{
+  allUsers {
+    username
+    id
+    favoriteGenre
+  }
+}
+`
+
 export const CREATE_BOOK = gql`
 mutation createBook($title: String!, $author: String!, $published: String!, $genres: [String!]!){
   addBook(
@@ -45,6 +55,26 @@ mutation createBook($title: String!, $author: String!, $published: String!, $gen
     ...BookDetails
   }
 }${BOOK_DETAILS}
+`
+
+export const CREATE_USER = gql`
+mutation createUser($username: String!, $password: String!, $favoriteGenre: String!){
+  createUser(
+    username: $username, 
+    password: $password, 
+    favoriteGenre: $favoriteGenre
+  ){
+    token {
+      value
+    }
+    user {
+      username
+      favoriteGenre
+      id
+    }
+
+  }
+}
 `
 
 export const EDIT_AUTHOR = gql`

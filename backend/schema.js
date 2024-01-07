@@ -7,6 +7,10 @@ const typeDefs = `
   type Token {
     value: String!
   }
+  type Auth {
+    user: User
+    token: Token
+  }
   type Author {
     name: String!
     id: ID!
@@ -25,6 +29,7 @@ const typeDefs = `
     authorCount: Int!
     allBooks(author: String, genres: String): [Book!]!
     allAuthors: [Author!]!
+    allUsers: [User!]!
     me: User
   }
   type Mutation {
@@ -40,8 +45,9 @@ const typeDefs = `
     ): Author
     createUser(
       username: String!
+      password: String!
       favoriteGenre: String!
-    ): User
+    ): Auth
     login(
       username: String!
       password: String!

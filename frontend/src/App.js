@@ -3,7 +3,7 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import { useQuery, useApolloClient, useSubscription } from '@apollo/client'
-import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED, USER  } from './queries'
+import { ALL_AUTHORS, ALL_BOOKS, ALL_USERS, BOOK_ADDED, USER  } from './queries'
 import Notify from './components/Notify'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
@@ -12,6 +12,7 @@ import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { FaBook } from 'react-icons/fa'
 import { Routes, Route, Link } from 'react-router-dom'
+import SignUp from './components/SignUp'
 
 export const updateCache = (cache, query, addedBook) => {
   const uniqByTitle = (a) => {
@@ -33,6 +34,7 @@ const App = () => {
   const [page, setPage] = useState('authors')
   const authors = useQuery(ALL_AUTHORS)
   const books = useQuery(ALL_BOOKS)
+  const users = useQuery(ALL_USERS)
   const user = useQuery(USER) 
   const [errorMessage, setErrorMessage] = useState(null)
   const [token, setToken] = useState(null)
@@ -84,6 +86,7 @@ const App = () => {
   console.log('authors', authors.data.allAuthors)
   console.log('books', books.data.allBooks)
   console.log('user', user.data.me)
+  console.log('all users', users.data.allUsers)
 
   const notify = (message) => {
     setErrorMessage(message)
@@ -101,6 +104,13 @@ const App = () => {
       label: 'Login', 
       condition: !token, 
       action: () => setPage('login') 
+    },
+    { 
+      name: 'signup',
+      path: '/signup', 
+      label: 'Signup', 
+      condition: !token, 
+      action: () => setPage('signup') 
     },
     { 
       name: 'add', 
@@ -183,9 +193,8 @@ const App = () => {
                     <Link
                       key={item.name}
                       to={item.path}
-                      as="a"
                       href={item.href}
-                      onClick={() =>item.action}
+                      onClick={item.action}
                       className={classNames(
                         item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'block rounded-md px-3 py-2 text-base font-medium'
@@ -208,6 +217,7 @@ const App = () => {
           <Route path='/addBook' element={token? <NewBook show={page === 'add'} setError={notify} /> : <LoginForm setToken={setToken} setError={notify}/>} />
           <Route path='/recommend' element={token? <Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/> : <LoginForm setToken={setToken} setError={notify}/>} />
           <Route path='/login' element={token ? <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/> : <LoginForm show={page === 'login'} setToken={setToken} setError={notify}/>} />
+          <Route path='/signup' element={token ? <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/> : <SignUp show={page === 'signup'} setToken={setToken} setError={notify}/>} />
         </Routes>        
       
     </div>
