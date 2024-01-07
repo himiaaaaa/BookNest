@@ -4,6 +4,7 @@ import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries'
 //import Notify from './Notify'
 import { updateCache } from '../App'
 import { Button } from '@material-tailwind/react'
+import { useNavigate } from 'react-router-dom'
 
 const NewBook = ({show, setError}) => {
   const [title, setTitle] = useState('')
@@ -11,6 +12,8 @@ const NewBook = ({show, setError}) => {
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+  const navigate = useNavigate()
+
   const [ createBook ] = useMutation(CREATE_BOOK,{
     refetchQueries: [{ query:ALL_AUTHORS }], 
     onError: (error) => {
@@ -34,12 +37,21 @@ const NewBook = ({show, setError}) => {
     console.log('add book...')
 
     createBook({ variables: { title, author, published, genres } })
+      .then(() => {
+        navigate('/');
+        window.location.reload();
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.log('error', error.message);
+      });
 
     setTitle('')
     setPublished('')
     setAuthor('')
     setGenres([])
     setGenre('')
+
   }
 
   const addGenre = () => {
@@ -61,7 +73,7 @@ const NewBook = ({show, setError}) => {
                 </h2>
                 <form className="mt-8 space-y-6" onSubmit={submit}>
                   <div>
-                  <label for="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title:</label>
+                  <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title:</label>
                     <input
                       value={title}
                       onChange={({ target }) => setTitle(target.value)}
@@ -69,7 +81,7 @@ const NewBook = ({show, setError}) => {
                     />
                   </div>
                   <div>
-                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Author:</label>
+                    <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Author:</label>
                     <input
                       value={author}
                       onChange={({ target }) => setAuthor(target.value)}
@@ -77,7 +89,7 @@ const NewBook = ({show, setError}) => {
                     />
                   </div>
                   <div>
-                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published:</label>
+                    <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published:</label>
                     <input
                       type="number"
                       value={published}
@@ -86,7 +98,7 @@ const NewBook = ({show, setError}) => {
                     />
                   </div>
                   <div>
-                    <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Genre:</label>
+                    <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Genre:</label>
                     <div className="flex space-x-2">
                       <input
                       value={genre}

@@ -8,7 +8,7 @@ import Notify from './components/Notify'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
 import Loading from './components/Loading'
-import { Disclosure, } from '@headlessui/react'
+import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { FaBook } from 'react-icons/fa'
 import { Routes, Route, Link } from 'react-router-dom'
@@ -119,7 +119,7 @@ const App = () => {
     { 
       name: 'recommend', 
       label: 'Recommend', 
-      condition: undefined, 
+      condition: token, 
       action: () => setPage('recommend'),
       path: '/recommend'
      },
@@ -127,7 +127,7 @@ const App = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <Notify errorMessage={errorMessage} />
+      <Notify errorMessage={errorMessage} />       
       <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>
@@ -180,11 +180,12 @@ const App = () => {
                 <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                   {pageButtons.map((item) => (
                     item.condition !== undefined && !item.condition ? null :
-                    <Disclosure.Button
+                    <Link
                       key={item.name}
+                      to={item.path}
                       as="a"
                       href={item.href}
-                      onClick={item.action}
+                      onClick={() =>item.action}
                       className={classNames(
                         item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'block rounded-md px-3 py-2 text-base font-medium'
@@ -192,7 +193,7 @@ const App = () => {
                       aria-current={item.current ? 'page' : undefined}
                     >
                       {item.name}
-                    </Disclosure.Button>
+                    </Link>
                     ))}
                 </div>
               </Disclosure.Panel>
@@ -202,60 +203,15 @@ const App = () => {
       </Disclosure>
 
         <Routes>
-          <Route path='/' element={<Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/>} />
+          <Route path='/' element={<Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify} user={user.data.me}/>} />
           <Route path='/books' element={<Books show={page === 'books'} books={books.data.allBooks} setError={notify} />} />
           <Route path='/addBook' element={token? <NewBook show={page === 'add'} setError={notify} /> : <LoginForm setToken={setToken} setError={notify}/>} />
-          <Route path='/recommend' element={<Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/>} />
+          <Route path='/recommend' element={token? <Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/> : <LoginForm setToken={setToken} setError={notify}/>} />
           <Route path='/login' element={token ? <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify}/> : <LoginForm show={page === 'login'} setToken={setToken} setError={notify}/>} />
-        </Routes>               
+        </Routes>        
       
     </div>
   )
-
-  //  {pageButtons.map((button) => (
-  //    button.condition !== undefined && !button.condition ? null :
-  //      <Link
-  //        key={button.name}
-  //        to={button.path}
-  //        href={button.href}
-  //        onClick={button.action}
-  //        className={classNames(
-  //          page === button.name ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-  //          'block rounded-md px-3 py-2 text-base font-medium'
-  //        )}
-  //        aria-current={page === button.name ? 'page' : undefined}
-  //      >
-  //        {button.label}
-  //      </Link>
-  //  ))}
-
-  // return (
-  //   <div className="bg-gray-100 min-h-screen">
-  //     <Notify errorMessage={errorMessage} />
-  //     <div className="flex justify-center items-center mt-4 space-x-4">
-  //       <button onClick={() => setPage('authors')} >authors</button>
-  //       <button onClick={() => setPage('books')}>books</button>
-  //       {!token ? 
-  //       <button onClick={() => setPage('login')}>login</button>
-  //       : <div>
-  //           <button onClick={() => setPage('add')}>add book</button>
-  //           <button onClick={logout}>logout</button>
-  //         </div>
-  //       }
-  //       <button onClick={() => setPage('recommend')}>recommend</button>
-  //     </div>
-
-  //     <Authors show={page === 'authors'} authors={authors.data.allAuthors} setError={notify} />
-
-  //     <Books show={page === 'books'} books={books.data.allBooks} />
-
-  //     <NewBook show={page === 'add'} setError={notify}/>
-
-  //     <LoginForm show={page === 'login'} setToken={setToken} setError={notify} /> 
-
-  //     <Recommend show={page === 'recommend'} user={user.data.me} books={books.data.allBooks}/>
-  //   </div>
-  // )
 }
 
 export default App
