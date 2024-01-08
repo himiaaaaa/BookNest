@@ -6,13 +6,13 @@ import {
 } from "@material-tailwind/react"
 
 const Books = ({show, books}) => {
-  const [filter, setFilter] = useState('all genres')
+  const [filter, setFilter] = useState('All genres')
 
   const genreDuplicateArray = books.map(b => b.genres).flat()
 
   const genres = [...new Set(genreDuplicateArray)] //uses the Set object to remove duplicate values from the genreDuplicateArray
 
-  genres.push("All genres")
+  genres.unshift("All genres")
 
   console.log('genreArray', genres)
 
@@ -22,7 +22,7 @@ const Books = ({show, books}) => {
     return null
   }
 
-  const filteredBook = books.filter(book => filter === 'all genres'? book : book.genres.includes(filter))
+  const filteredBook = books.filter(book => filter === 'All genres'? book : book.genres.includes(filter))
 
   const TABLE_HEAD = ["Book", "Author", "Published"];
 
