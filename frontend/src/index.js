@@ -21,12 +21,14 @@ const authLink = setContext((_, { headers }) => {
     }
 })
 
+const PORT = process.env.PORT || 4000
+
 const httpLink = createHttpLink({
-    uri: 'https://booknest-lsjz.onrender.com',
+    uri: `http://localhost:${PORT}`,
 })
 
 const wsLink = new GraphQLWsLink(  createClient({ 
-    url: 'https://booknest-lsjz.onrender.com' 
+    url: `ws://localhost:${PORT}`
 }))
 
 const splitLink = split(

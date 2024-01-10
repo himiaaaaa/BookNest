@@ -87,15 +87,15 @@ const start = async () => {
 
   app.use(express.static('build'))
 
-  //const PORT = process.env.PORT || 4000
-
-  // httpServer.listen(PORT, () => 
-  //   console.log(`Server is now running on http://localhost:${PORT}`)
-  // )
+  const PORT = process.env.PORT || 4000
 
   httpServer.listen(PORT, () => 
-    console.log(`Server is now running on https://booknest-lsjz.onrender.com`)
+    console.log(`Server is now running on http://localhost:${PORT}`)
   )
+
+  // httpServer.listen(PORT, () => 
+  //   console.log(`Server is now running on https://booknest-lsjz.onrender.com`)
+  // )
 }
 
 start()
