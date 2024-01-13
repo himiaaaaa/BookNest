@@ -39,5 +39,5 @@ Live at: https://booknest-lsjz.onrender.com/
 ## Screenshots
 
 ![Screenshots](https://res.cloudinary.com/dxnmrthvk/image/upload/v1705157932/patientor/Screenshot_2024-01-13_at_16.58.44_ihktyb.png)
-![Screenshots](https://res.cloudinary.com/dxnmrthvk/image/upload/v1705155634/patientor/homepage_mapqyt.png)
+![Screenshots](https://res.cloudinary.com/dxnmrthvk/image/upload/v1705158081/patientor/Screenshot_2024-01-13_at_17.01.14_if3gtg.png)
 ![Screenshots](https://res.cloudinary.com/dxnmrthvk/image/upload/v1705158152/patientor/Screenshot_2024-01-13_at_17.02.26_qtbyia.png)
